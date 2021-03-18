@@ -4,6 +4,8 @@ import eli5
 
 from sklearn.tree import DecisionTreeClassifier
 from sklearn import tree
+from sklearn.ensemble import BaggingClassifier
+
 
 #  take data in kaggle.com/c/titanic/data
 data = pd.read_csv('train.csv')
@@ -49,38 +51,25 @@ X['Sex'] = X['Sex'].apply(lambda x:d[x])
 
 from sklearn.model_selection import train_test_split
 
-X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.33, random_state=42)
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.1, random_state=42) # test_size=0.1 - уменьшаем или увеличиваем размер тестовой выборки
 
 
 clf = tree.DecisionTreeClassifier(max_depth=5, random_state=21) # строим дерево
-clf.fit(X_train, Y_train)      # обучаем модель
-aaa =  clf.score(X_test, Y_test)    # проверяем точность
-# print(aaa)
+
+bagging = BaggingClassifier(base_estimator=clf, n_estimators=500)  # 100 выборок 200б 300
+
+bagging.fit(X_train, Y_train)      # обучаем модель bagging
+
+print(bagging.score(X_test,Y_test))
 
 
-# print(dir(eli5))
-weights =  eli5.explain_weights_sklearn( clf, feature_names=X_train.columns.values)
 
-print(weights)
-# # Загружаем модель Support VEctor Machine для обучения
 
-from sklearn import svm
 
-predmodel = svm.LinearSVC()
 
-# # # Обучаем модель с помощью нашей обучающей выборки
 
-predmodel.fit(X_train, Y_train)
 
-# # # Предсказываем на тестовой выборке
 
-pred1 = predmodel.predict(X_test[0:10])
-print(pred1)
-# # # Проверяем точность предсказаний
-
-pred1Score = predmodel.score(X_test,Y_test)
-
-print(pred1Score)
 
 
 
